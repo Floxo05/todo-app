@@ -12,6 +12,14 @@
     background-color: rgba(42, 112, 13, 0.47);
 }
 
+.share-button {
+    background-color: rgba(40, 101, 215, 0.66);
+}
+
+.share-button:hover {
+    background-color: rgba(30, 71, 159, 0.66);
+}
+
 .delete-button {
     background-color: rgba(244, 67, 54, 0.56);
 }

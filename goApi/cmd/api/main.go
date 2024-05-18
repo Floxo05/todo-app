@@ -32,6 +32,7 @@ func main() {
 		authRoutes.PUT("/todo/:id", routes.UpdateTodoById)
 		authRoutes.DELETE("/todo/:id", routes.DeleteTodoById)
 		authRoutes.GET("/check-token", routes.CheckToken)
+		authRoutes.POST("/share", routes.ShareToUser)
 	}
 
 	r.POST("/login", routes.Login)

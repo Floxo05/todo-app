@@ -21,7 +21,7 @@ func GetJWTToken(req types.AuthRequest) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = req.Username
-	claims["exp"] = time.Now().Add(time.Minute * 1).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }

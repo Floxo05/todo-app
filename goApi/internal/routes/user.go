@@ -83,6 +83,71 @@ func CheckToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
 }
 
+func ShareToUser(c *gin.Context) {
+	user, err := GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve shareUser"})
+		return
+	}
+
+	var req types.ShareToUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	if req.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "'username' must not be empty"})
+		return
+	}
+
+	if req.TodoID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "'id' must not be empty"})
+		return
+	}
+
+	var shareUser models.User
+	shareUser, err = GetUserByUsername(req.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve shareUser"})
+		return
+	}
+
+	err = shareTodoToUser(req.TodoID, user, shareUser)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Todo shared successfully"})
+}
+
+func shareTodoToUser(id int, user models.User, shareUser models.User) error {
+	db, err := tools.InitDB()
+	if err != nil {
+		return err
+	}
+
+	// check if user is the owner of the todo
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM user_todos ut JOIN todos t ON t.id = ut.todo_id WHERE ut.user_id = ? AND ut.todo_id = ? AND t.owner_id = ?", user.ID, id, user.ID).Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return errors.New("user does not have access to delete the todo")
+	}
+
+	_, err = db.Exec("INSERT INTO user_todos (todo_id, user_id) VALUES (?, ?)", id, shareUser.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // #############################
 // #############################
 // #############################

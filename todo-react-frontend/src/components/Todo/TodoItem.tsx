@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import './TodoItem.css';
 import {Todo} from "./TodoList";
-import {FaAsymmetrik, FaEdit, FaSave} from 'react-icons/fa';
+import {FaEdit, FaSave, FaShare} from 'react-icons/fa';
 
 type TodoItemProps = {
     todo: Todo;
@@ -10,7 +10,7 @@ type TodoItemProps = {
     updateTodo: (todo: Todo, title: string) => void;
 };
 
-const TodoItem: React.FC<TodoItemProps> = ({ todo, toggleTodo, index, updateTodo }) => {
+const TodoItem: React.FC<TodoItemProps> = ({todo, toggleTodo, index, updateTodo}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(todo.title);
 
@@ -18,11 +18,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, toggleTodo, index, updateTodo
         if (!isEditing) {
             toggleTodo(todo);
         }
-    }
-
-    const handleEditClick = () => {
-        console.log(isEditing);
-        setIsEditing(!isEditing);
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,23 +34,22 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, toggleTodo, index, updateTodo
             <div className="text-container">
                 <input type="checkbox" checked={todo.completed} onChange={handleTodoClick}/>
                 {isEditing ? (
-                    <input type="text" value={title} onChange={handleInputChange} onBlur={handleInputBlur} autoFocus />
+                    <input type="text" value={title} onChange={handleInputChange} onBlur={handleInputBlur} autoFocus/>
                 ) : (
                     <span onClick={handleTodoClick}>{todo.title}</span>
                 )}
             </div>
-            {!todo.completed && (
-                <>
-                    {isEditing ? (
-                        <div className="icon-container">
-                            <FaSave onClick={() => setIsEditing(false)}/>
-                        </div>
-                    ) : (
-                        <div className="icon-container">
-                            <FaEdit onClick={() => setIsEditing(true)}/>
-                        </div>)}
-                </>
-            )}
+            <div className={'icon-container'}>
+                {!todo.completed && (
+                    <div className={'icon'}>
+                        {isEditing ? (
+                            <FaSave onClick={() => setIsEditing(false)} title={'edit'}/>
+                        ) : (
+                            <FaEdit onClick={() => setIsEditing(true)} title={'edit'}/>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

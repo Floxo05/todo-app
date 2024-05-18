@@ -52,6 +52,18 @@ class TodoService {
         return this.returnData(data);
     }
 
+    static async shareTodo(username: string, todo: Todo) {
+        const response = await fetch(process.env.REACT_APP_API + `/auth/share`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + AuthHelper.getToken() || '',
+            },
+            body: JSON.stringify({username, id: todo.id}),
+        });
+
+    }
+
     private static returnData(data: any) {
         // if data has attribute error, throw error with data.error
         if (data.error) {

@@ -23,6 +23,10 @@
     justify-content: flex-end;
 }
 
+.todo-item .icon:hover {
+    cursor: pointer;
+}
+
 .todo-item.completed {
     text-decoration: line-through; /* Text durchstreichen */
     background-color: #444; /* Hintergrundfarbe dunkler machen */

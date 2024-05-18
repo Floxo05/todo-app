@@ -19,3 +19,8 @@ type UpdateTodoRequest struct {
 	Completed *bool   `json:"completed"`
 	ID        *int    `json:"id"`
 }
+
+type ShareToUserRequest struct {
+	Username string `json:"username"`
+	TodoID   int    `json:"id"`
+}

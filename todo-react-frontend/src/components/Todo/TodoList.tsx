@@ -6,9 +6,10 @@ import AuthHelper from "../../utils/auth/Auth";
 import {useNavigate} from "react-router-dom";
 import TodoService from "../../utils/todo/TodoService";
 import ErrorMessage from "../Auth/ErrorMessage";
+import ShareModal from "./ShareModal";
 
 export type Todo = {
-    id?: number;
+    id: number;
     title: string;
     completed: boolean;
 };
@@ -19,6 +20,9 @@ function TodoList() {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false); // Zustand für das Modal
+    const [username, setUsername] = useState(''); // Zustand für den Nutzernamen
+
 
     const addTodo = (title: string) => {
         setErrorMessage('');
@@ -27,7 +31,7 @@ function TodoList() {
             return;
         }
 
-        let newTodo = {title, completed: false};
+        let newTodo = {title, completed: false, id:0};
         TodoService.addTodo(newTodo).then((res: any) => {
             const newTodos = [...todos, {id: res.todo_id, title, completed: false}];
             setTodos(newTodos);
@@ -45,8 +49,8 @@ function TodoList() {
                 setTodos(res.todos);
             }
         }).catch((error: any) => {
-            setErrorMessage(prevState => 'Error loading todos')
-            // console.error(error);
+            setErrorMessage('Error loading todos')
+            console.error(error);
         });
     }
 
@@ -110,12 +114,41 @@ function TodoList() {
         navigate("/login", {replace: true});
     };
 
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleShareClick = () => {
+        openModal();
+    };
+
+    const handleShareConfirm = () => {
+        const todosToShare: Todo[] = todos.filter(todo => todo.completed);
+
+
+        Promise.all(todosToShare.map(todo => TodoService.shareTodo(username, todo)))
+            .then(() => {
+
+            })
+            .catch((error: any) => {
+                setErrorMessage(error.message)
+                console.error(error);
+            });
+
+        closeModal();
+    };
+
     return (
         <>
             <div className="header">
                 <h1>
                     ToDo App
-                    <FaSignOutAlt onClick={doLogout} className={'react-icon'} title={'abmelden'}/>
+                    <FaSignOutAlt onClick={doLogout} className={'react-icon'} title={'logout'}/>
                 </h1>
             </div>
 
@@ -141,15 +174,34 @@ function TodoList() {
                         Add ToDo
                     </button>
                     {
-                        todos.some(todo => todo.completed) && (<button
-                            className="delete-button"
-                            onClick={deleteCompletedTodos} // Ruft die Funktion deleteCompletedTodos auf, wenn geklickt wird
-                        >
-                            Delete completed ToDos
+                        todos.some(todo => todo.completed) && (
+                            <>
+                                <button
+                                    className="share-button"
+                                    onClick={handleShareClick}
+                                >
+                                    Share
+                                </button>
 
-                        </button>)}
+                                <button
+                                    className="delete-button"
+                                    onClick={deleteCompletedTodos} // Ruft die Funktion deleteCompletedTodos auf, wenn geklickt wird
+                                >
+                                    Delete completed ToDos
+
+                                </button>
+                            </>
+                        )}
 
                 </div>
+                <ShareModal
+                    isOpen={isModalOpen}
+                    onRequestClose={closeModal}
+                    onShareConfirm={handleShareConfirm}
+                    username={username}
+                    setUsername={setUsername}
+                    todosCount={todos.length}
+                />
             </div>
             {errorMessage && <ErrorMessage message={errorMessage}/>}
         </>
