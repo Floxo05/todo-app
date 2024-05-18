@@ -1,0 +1,43 @@
+
+.form {
+    margin-top: 20px;
+}
+
+
+.add-button {
+    background-color: rgba(69, 185, 20, 0.47);
+}
+
+.add-button:hover {
+    background-color: rgba(42, 112, 13, 0.47);
+}
+
+.delete-button {
+    background-color: rgba(244, 67, 54, 0.56);
+}
+
+.delete-button:hover {
+    background-color: rgba(157, 44, 37, 0.56);
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header .react-icon{
+    margin-left: 20px;
+    font-size: 0.8em;
+}
+
+.header .react-icon:hover {
+    cursor: pointer;
+}
+

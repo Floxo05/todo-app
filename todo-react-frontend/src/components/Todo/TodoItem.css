@@ -1,0 +1,45 @@
+.todo-item {
+    color: #fff;
+    background-color: #555;
+    border: 1px solid #6c757d;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Text linksbündig machen */
+}
+
+.todo-item .text-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+}
+
+.todo-item .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.todo-item.completed {
+    text-decoration: line-through; /* Text durchstreichen */
+    background-color: #444; /* Hintergrundfarbe dunkler machen */
+}
+
+.todo-item input[type="checkbox"] {
+    margin-right: 10px; /* Abstand zwischen Checkbox und Text */
+}
+
+.todo-item input[type="checkbox"]:hover {
+    cursor: pointer;
+}
+
+.todo-item span {
+    text-align: left;
+}
+
+.todo-item span:hover {
+    cursor: pointer;
+}
