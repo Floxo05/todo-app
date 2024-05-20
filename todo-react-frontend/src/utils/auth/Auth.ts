@@ -22,7 +22,7 @@ class AuthHelper {
         localStorage.setItem('token', data.token);
     }
 
-    static async register(formValues: RegisterFormValues): Promise<void>  {
+    static async register(formValues: RegisterFormValues): Promise<void> {
         const response = await fetch(process.env.REACT_APP_API + "/register", {
             method: 'POST',
             headers: {
@@ -57,6 +57,16 @@ class AuthHelper {
         });
 
         return response.status === 200;
+    }
+
+    static validatePassword(password: string): boolean {
+        const hasMinLen = /.{8,}/.test(password);
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password);
+
+        return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial;
     }
 }
 

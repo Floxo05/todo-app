@@ -62,6 +62,9 @@ class TodoService {
             body: JSON.stringify({username, id: todo.id}),
         });
 
+        const data = await response.json();
+
+        return this.returnData(data);
     }
 
     private static returnData(data: any) {

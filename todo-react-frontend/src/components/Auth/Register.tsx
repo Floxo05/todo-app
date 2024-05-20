@@ -23,6 +23,24 @@ function RegisterForm() {
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        // check if username has at least 3 characters
+        if (formValues.username.length < 3) {
+            setErrorMessage('Username must be at least 3 characters long');
+            return;
+        }
+
+        // Check if password and confirmPassword are the same
+        if (formValues.password !== formValues.confirmPassword) {
+            setErrorMessage('Passwords do not match');
+            return;
+        }
+
+        if (!AuthHelper.validatePassword(formValues.password)) {
+            setErrorMessage("Password must be at least 8 characters long and contain at least one number and one special character.");
+            return;
+        }
+
         try {
             await AuthHelper.register(formValues);
             navigate('/');
