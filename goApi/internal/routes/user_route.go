@@ -17,11 +17,11 @@ type UserRoute struct {
 }
 
 func NewUserRoute(
-	repo types.UserRepository,
+	userRepo types.UserRepository,
 	passwordHasher types.PasswordHasherInterface,
 	userContextHelper types.UserContextInterface) *UserRoute {
 	return &UserRoute{
-		userRepository:    repo,
+		userRepository:    userRepo,
 		passwordHasher:    passwordHasher,
 		userContextHelper: userContextHelper}
 }
