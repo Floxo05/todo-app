@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	db   *sql.DB
+	DB   *sql.DB
 	once sync.Once
 )
 
@@ -25,18 +25,18 @@ func InitDB() (*sql.DB, error) {
 
 		dbURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, dbname)
 
-		db, err = sql.Open("mysql", dbURL)
+		DB, err = sql.Open("mysql", dbURL)
 		if err != nil {
 			err = fmt.Errorf("error opening database: %v", err)
 			return
 		}
 
-		err = db.Ping()
+		err = DB.Ping()
 		if err != nil {
 			err = fmt.Errorf("error connecting to the database: %v", err)
 			return
 		}
 	})
 
-	return db, err
+	return DB, err
 }

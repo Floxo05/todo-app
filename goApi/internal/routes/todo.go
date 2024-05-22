@@ -57,7 +57,7 @@ func CreateTodo(c *gin.Context) {
 func GetTodos(c *gin.Context) {
 	user, err := GetUserFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
