@@ -1,22 +1,21 @@
 import React, {useState} from 'react';
 import './TodoItem.css';
 import {Todo} from "./TodoList";
-import {FaEdit, FaSave, FaShare} from 'react-icons/fa';
+import {FaEdit, FaSave} from 'react-icons/fa';
 
 type TodoItemProps = {
     todo: Todo;
-    toggleTodo: (todo: Todo) => void;
-    index: number;
-    updateTodo: (todo: Todo, title: string) => void;
+    updateTodo: (todo: Todo) => void;
 };
 
-const TodoItem: React.FC<TodoItemProps> = ({todo, toggleTodo, index, updateTodo}) => {
+const TodoItem: React.FC<TodoItemProps> = ({todo, updateTodo}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(todo.title);
 
     const handleTodoClick = () => {
         if (!isEditing) {
-            toggleTodo(todo);
+            todo.completed = !todo.completed;
+            updateTodo(todo);
         }
     }
 
@@ -25,7 +24,8 @@ const TodoItem: React.FC<TodoItemProps> = ({todo, toggleTodo, index, updateTodo}
     }
 
     const handleInputBlur = () => {
-        updateTodo(todo, title);
+        todo.title = title;
+        updateTodo(todo);
         setIsEditing(false);
     }
 

@@ -98,6 +98,12 @@ func (t *TodoRepo) DeleteTodoById(todo *types.Todo, user *types.User) error {
 		return errors.New("user does not have right to delete the todo")
 	}
 
+	// delete association
+	_, err = t.db.Exec("DELETE FROM user_todos where todo_id = ?", todo.ID)
+	if err != nil {
+		return err
+	}
+
 	_, err = t.db.Exec("DELETE FROM todos WHERE id = ?", todo.ID)
 	if err != nil {
 		return err

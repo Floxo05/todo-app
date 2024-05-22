@@ -30,6 +30,11 @@ func (t *TodoRoute) GetTodos(c *gin.Context) {
 		return
 	}
 
+	if todos == nil {
+		c.JSON(http.StatusOK, []types.Todo{})
+		return
+	}
+
 	c.JSON(http.StatusOK, todos)
 }
 

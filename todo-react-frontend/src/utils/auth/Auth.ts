@@ -50,13 +50,21 @@ class AuthHelper {
     }
 
     static async checkToken(): Promise<boolean> {
-        const response = await fetch(process.env.REACT_APP_API + '/auth/check-token', {
-            headers: {
-                "Authorization": "Bearer " + AuthHelper.getToken() || ""
-            }
-        });
+        if (!AuthHelper.getToken()) {
+            return false;
+        }
 
-        return response.status === 200;
+        try {
+            const response = await fetch(process.env.REACT_APP_API + '/auth/check-token', {
+                headers: {
+                    "Authorization": "Bearer " + AuthHelper.getToken() || ""
+                }
+            });
+
+            return response.status === 200;
+        } catch (e) {
+            return false;
+        }
     }
 
     static validatePassword(password: string): boolean {

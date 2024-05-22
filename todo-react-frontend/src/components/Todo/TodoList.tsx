@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './TodoList.css';
 import TodoItem from './TodoItem';
-import {FaSignOutAlt, FaTrash} from "react-icons/fa";
+import {FaSignOutAlt} from "react-icons/fa";
 import AuthHelper from "../../utils/auth/Auth";
 import {useNavigate} from "react-router-dom";
 import TodoService from "../../utils/todo/TodoService";
@@ -12,6 +12,7 @@ export type Todo = {
     id: number;
     title: string;
     completed: boolean;
+    owner_id: number;
 };
 
 function TodoList() {
@@ -31,9 +32,9 @@ function TodoList() {
             return;
         }
 
-        let newTodo = {title, completed: false, id:0};
+        let newTodo = {title, completed: false, id:0, owner_id: 0};
         TodoService.addTodo(newTodo).then((res: any) => {
-            const newTodos = [...todos, {id: res.todo_id, title, completed: false}];
+            const newTodos = [...todos, {id: res.id, title, completed: false, owner_id: res.owner_id}];
             setTodos(newTodos);
         }).catch((error: any) => {
             setErrorMessage('Error adding todo')
@@ -45,8 +46,8 @@ function TodoList() {
 
     const loadTodos =  () => {
         TodoService.getTodos().then((res: any) => {
-            if (res.todos) {
-                setTodos(res.todos);
+            if (res) {
+                setTodos(res);
             }
         }).catch((error: any) => {
             setErrorMessage('Error loading todos')
@@ -74,10 +75,9 @@ function TodoList() {
             });
     };
 
-    const toggleTodo = (todo: Todo) => {
+    const updateTodo = (todo: Todo) => {
 
         const newTodos: Todo[] = [...todos];
-        todo.completed = !todo.completed;
 
         TodoService.updateTodoStatus(todo)
             .then(() => {
@@ -92,12 +92,7 @@ function TodoList() {
             });
     };
 
-    const updateTodo = (todo: Todo, title: string) => {
-        const newTodos: Todo[] = [...todos];
-        const index: number = newTodos.findIndex(t => t.id === todo.id);
-        newTodos[index].title = title;
-        setTodos(newTodos);
-    }
+
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
@@ -153,7 +148,7 @@ function TodoList() {
             </div>
 
             {todos.map((todo, index) => (
-                <TodoItem key={index} todo={todo} toggleTodo={toggleTodo} index={index} updateTodo={updateTodo}/>
+                <TodoItem key={index} todo={todo} updateTodo={updateTodo}/>
             ))}
             <div className={"form"}>
                 <label htmlFor="todo-input">New ToDo:</label>
