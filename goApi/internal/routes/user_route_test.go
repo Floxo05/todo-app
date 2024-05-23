@@ -2,7 +2,6 @@ package routes
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"github.com/floxo05/todoapi/internal/types"
 	"github.com/gin-gonic/gin"
@@ -20,34 +19,64 @@ func TestUserRoute_Login(t *testing.T) {
 	router.POST("/login", loginRoute.Login)
 
 	testcases := []struct {
-		Username   string
-		Password   string
-		shouldPass bool
+		Body             []byte
+		expectedResponse int
 	}{
-		{Username: "", Password: "", shouldPass: false},
-		{Username: "test", Password: "", shouldPass: false},
-		{Username: "", Password: "test", shouldPass: false},
-		{Username: "test", Password: "Test1234!", shouldPass: true},
+		{Body: nil, expectedResponse: http.StatusBadRequest},
+		{Body: []byte(`{"Username": "", "Password": ""}`), expectedResponse: http.StatusNotFound},
+		{Body: []byte(`{"Username": "test", "Password": ""}`), expectedResponse: http.StatusUnauthorized},
+		{Body: []byte(`{"Username": "test", "Password": "Test1234!"}`), expectedResponse: http.StatusOK},
 	}
 
 	for _, tc := range testcases {
 		t.Run("Test Login", func(t *testing.T) {
 			// Act
-			reqBodyBytes, _ := json.Marshal(tc)
-			req := httptest.NewRequest("POST", "/login", bytes.NewBuffer(reqBodyBytes))
+			req := httptest.NewRequest("POST", "/login", bytes.NewBuffer(tc.Body))
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 
 			// Assert
-			if tc.shouldPass && w.Code != http.StatusOK {
+			if tc.expectedResponse != w.Code {
 				t.Errorf("Expected status code 200, but got %d", w.Code)
-			}
-			if !tc.shouldPass && w.Code == http.StatusOK {
-				t.Errorf("Expected failure status code, but got %d", w.Code)
 			}
 		})
 	}
 }
+
+func TestUserRoute_Register(t *testing.T) {
+	// Arrange
+	gin.SetMode(gin.TestMode)
+	router := gin.Default()
+
+	loginRoute := NewUserRoute(&mockUserRepository{}, &mockPasswordHasher{}, &mockUserContextHelper{})
+	router.POST("/register", loginRoute.Register)
+
+	testcases := []struct {
+		Body             []byte
+		expectedResponse int
+	}{
+		{Body: nil, expectedResponse: http.StatusBadRequest},
+		{Body: []byte(`{"Username": "", "Password": ""}`), expectedResponse: http.StatusBadRequest},
+		{Body: []byte(`{"Username": "test", "Password": ""}`), expectedResponse: http.StatusBadRequest},
+		{Body: []byte(`{"Username": "test", "Password": "Test1234!"}`), expectedResponse: http.StatusOK},
+	}
+
+	for _, tc := range testcases {
+		t.Run("Test Register", func(t *testing.T) {
+			// Act
+			req := httptest.NewRequest("POST", "/register", bytes.NewBuffer(tc.Body))
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
+
+			// Assert
+			if tc.expectedResponse != w.Code {
+				t.Errorf("Expected status code 200, but got %d", w.Code)
+			}
+		})
+	}
+}
+
+/////////////////////////////////////////////
 
 type mockUserRepository struct{}
 
@@ -73,11 +102,11 @@ func (m *mockUserRepository) ShareTodoWithUser(todoID int, user *types.User, sha
 type mockPasswordHasher struct{}
 
 func (m *mockPasswordHasher) HashPassword(password string) (string, error) {
-	if password == "" {
-		return "", errors.New("error")
-
+	if password == "Test1234!" {
+		return "hashedPassword", nil
 	}
-	return "hashedPassword", nil
+
+	return "", errors.New("error")
 }
 
 func (m *mockPasswordHasher) ComparePasswords(hashedPassword string, password string) error {

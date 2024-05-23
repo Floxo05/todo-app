@@ -35,7 +35,7 @@ func (u *UserRoute) Login(c *gin.Context) {
 
 	user, err := u.userRepository.GetUserByUsername(req.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
@@ -90,7 +90,7 @@ func (u *UserRoute) Register(c *gin.Context) {
 func (u *UserRoute) ShareToUser(c *gin.Context) {
 	user, err := u.userContextHelper.GetUserFromContext(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
@@ -113,7 +113,7 @@ func (u *UserRoute) ShareToUser(c *gin.Context) {
 	var shareUser *types.User
 	shareUser, err = u.userRepository.GetUserByUsername(req.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve shareUser"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Could not retrieve shareUser"})
 		return
 	}
 
