@@ -47,11 +47,12 @@ func main() {
 		authRoutes.Use(routes.JWTAuthMiddleware())
 		authRoutes.POST("/todo/create", todoRoute.CreateTodo)
 		authRoutes.GET("/todos", todoRoute.GetTodos)
-		authRoutes.PUT("/todo/:id", todoRoute.UpdateTodoById)
-		authRoutes.DELETE("/todo/:id", todoRoute.DeleteTodoById)
+		authRoutes.PUT("/todo/:id", todoRoute.UpdateTodo)
+		authRoutes.DELETE("/todo/:id", todoRoute.DeleteTodo)
 		authRoutes.GET("/check-token", tokenRoute.CheckToken)
 		authRoutes.POST("/share", userRoute.ShareToUser)
 		authRoutes.POST("/category/create", catRoute.CreateCategory)
+		authRoutes.GET("/categories", catRoute.GetCategories)
 	}
 
 	r.POST("/login", userRoute.Login)

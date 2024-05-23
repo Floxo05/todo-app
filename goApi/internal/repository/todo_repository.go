@@ -97,8 +97,14 @@ func (t *TodoRepo) UpdateTodoById(todo *types.Todo, user *types.User) error {
 		return errors.New("user does not have access to update the todo")
 	}
 
+	err = t.categoryRepo.UpsertCategory(&todo.Category)
+	if err != nil {
+		return err
+	}
+
+	_, err = t.db.Exec("UPDATE todos SET title = ?, completed = ?, category_id = ? WHERE id = ?", todo.Title, todo.Completed, todo.Category.ID, todo.ID)
+
 	// update
-	_, err = t.db.Exec("UPDATE todos SET title = ?, completed = ? WHERE id = ?", todo.Title, todo.Completed, todo.ID)
 	if err != nil {
 		return err
 	}

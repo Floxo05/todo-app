@@ -23,6 +23,7 @@ type CategoryRepository interface {
 	UpsertCategory(category *Category) error
 	GetCategoryFromDB(category *Category) (*Category, error)
 	GetCategoryByID(id int) (*Category, error)
+	GetCategoriesByUserId(userID int) ([]Category, error)
 }
 
 type Todo struct {
@@ -64,9 +65,10 @@ type AuthRequest struct {
 }
 
 type UpdateTodoRequest struct {
-	ID        *int    `json:"id"`
-	Title     *string `json:"title"`
-	Completed *bool   `json:"completed"`
+	ID        *int      `json:"id"`
+	Title     *string   `json:"title"`
+	Completed *bool     `json:"completed"`
+	Category  *Category `json:"category"`
 }
 
 type ShareToUserRequest struct {

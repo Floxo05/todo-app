@@ -25,7 +25,7 @@ class TodoService {
         return this.returnData(data);
     }
 
-    static async updateTodoStatus(todo: Todo) {
+    static async updateTodo(todo: Todo) {
         const response = await fetch(process.env.REACT_APP_API + `/auth/todo/${todo.id}`, {
             method: 'PUT',
             headers: {
@@ -69,7 +69,7 @@ class TodoService {
 
     private static returnData(data: any) {
         // if data has attribute error, throw error with data.error
-        if (data.error) {
+        if (data && data.error) {
             throw new Error(data.error);
         }
         return data;

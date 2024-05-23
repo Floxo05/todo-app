@@ -153,7 +153,7 @@ func TestTodoRepo_CreateTodo(t *testing.T) {
 }
 
 func TestTodoRepo_UpdateTodoById(t *testing.T) {
-	t.Run("Test UpdateTodoById", func(t *testing.T) {
+	t.Run("Test UpdateTodo", func(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		if err != nil {

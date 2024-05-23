@@ -30,11 +30,6 @@ func (t *TodoRoute) GetTodos(c *gin.Context) {
 		return
 	}
 
-	if todos == nil {
-		c.JSON(http.StatusOK, []types.Todo{})
-		return
-	}
-
 	c.JSON(http.StatusOK, todos)
 }
 
@@ -67,7 +62,7 @@ func (t *TodoRoute) CreateTodo(c *gin.Context) {
 	c.JSON(http.StatusOK, todo)
 }
 
-func (t *TodoRoute) UpdateTodoById(c *gin.Context) {
+func (t *TodoRoute) UpdateTodo(c *gin.Context) {
 	user, err := t.userContextHelper.GetUserFromContext(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -90,7 +85,8 @@ func (t *TodoRoute) UpdateTodoById(c *gin.Context) {
 		return
 	}
 
-	todo := types.Todo{ID: *req.ID, Title: *req.Title, Completed: *req.Completed}
+	todo := types.Todo{ID: *req.ID, Title: *req.Title, Completed: *req.Completed, Category: *req.Category}
+	todo.Category.CreatedUserId = user.ID
 
 	err = t.todoRepository.UpdateTodoById(&todo, user)
 	if err != nil {
@@ -101,7 +97,7 @@ func (t *TodoRoute) UpdateTodoById(c *gin.Context) {
 	c.JSON(http.StatusOK, todo)
 }
 
-func (t *TodoRoute) DeleteTodoById(c *gin.Context) {
+func (t *TodoRoute) DeleteTodo(c *gin.Context) {
 	user, err := t.userContextHelper.GetUserFromContext(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

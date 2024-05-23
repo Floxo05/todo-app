@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from 'react-modal';
-import './ShareModal.css';
+import './Modal.css';
 
 type ShareModalProps = {
     isOpen: boolean;

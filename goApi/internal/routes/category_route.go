@@ -37,3 +37,19 @@ func (cr *CategoryRoute) CreateCategory(c *gin.Context) {
 	category := types.Category{Title: req.Title, CreatedUserId: user.ID}
 	err = cr.categoryRepository.UpsertCategory(&category)
 }
+
+func (cr *CategoryRoute) GetCategories(c *gin.Context) {
+	user, err := cr.userContextHelper.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	categories, err := cr.categoryRepository.GetCategoriesByUserId(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, categories)
+}

@@ -7,13 +7,21 @@ import {useNavigate} from "react-router-dom";
 import TodoService from "../../utils/todo/TodoService";
 import ErrorMessage from "../Auth/ErrorMessage";
 import ShareModal from "./ShareModal";
+import CategoryService from "../../utils/todo/CategoryService";
 
 export type Todo = {
     id: number;
     title: string;
     completed: boolean;
     owner_id: number;
+    category: Category;
 };
+
+export type Category = {
+    id: number;
+    title: string;
+    create_user_id: number;
+}
 
 function TodoList() {
     const navigate = useNavigate();
@@ -21,9 +29,10 @@ function TodoList() {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false); // Zustand für das Modal
-    const [username, setUsername] = useState(''); // Zustand für den Nutzernamen
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [username, setUsername] = useState('');
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedTodos, setSelectedTodos] = useState<Todo[]>([]);
 
     const addTodo = (title: string) => {
         setErrorMessage('');
@@ -32,9 +41,15 @@ function TodoList() {
             return;
         }
 
-        let newTodo = {title, completed: false, id:0, owner_id: 0};
+        let newTodo = {title, completed: false, id: 0, owner_id: 0, category: {id: 0, title: '', create_user_id: 0}};
         TodoService.addTodo(newTodo).then((res: any) => {
-            const newTodos = [...todos, {id: res.id, title, completed: false, owner_id: res.owner_id}];
+            const newTodos = [...todos, {
+                id: res.id,
+                title,
+                completed: false,
+                owner_id: res.owner_id,
+                category: res.category
+            }];
             setTodos(newTodos);
         }).catch((error: any) => {
             setErrorMessage('Error adding todo')
@@ -44,7 +59,19 @@ function TodoList() {
         setInputValue(""); // Setzt den Wert des Eingabefelds zurück
     };
 
-    const loadTodos =  () => {
+    const loadCategories = () => {
+        CategoryService.getCategories().then((res: any) => {
+            if (res) {
+                setCategories(res);
+            }
+        }).catch((error: any) => {
+            setErrorMessage('Error loading categories')
+            console.error(error);
+        });
+    }
+
+    useEffect(() => {
+        // load todos
         TodoService.getTodos().then((res: any) => {
             if (res) {
                 setTodos(res);
@@ -53,11 +80,8 @@ function TodoList() {
             setErrorMessage('Error loading todos')
             console.error(error);
         });
-    }
 
-    useEffect(() => {
-        // load todos
-        loadTodos();
+        loadCategories();
     }, [])
 
     const deleteCompletedTodos = () => {
@@ -79,7 +103,7 @@ function TodoList() {
 
         const newTodos: Todo[] = [...todos];
 
-        TodoService.updateTodoStatus(todo)
+        TodoService.updateTodo(todo)
             .then(() => {
                 // replace the todo with the updated one
                 const index: number = newTodos.findIndex(t => t.id === todo.id);
@@ -90,8 +114,9 @@ function TodoList() {
                 setErrorMessage(error.message)
                 console.error(error);
             });
-    };
 
+        loadCategories();
+    };
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,10 +148,7 @@ function TodoList() {
     };
 
     const handleShareConfirm = () => {
-        const todosToShare: Todo[] = todos.filter(todo => todo.completed);
-
-
-        Promise.all(todosToShare.map(todo => TodoService.shareTodo(username, todo)))
+        Promise.all(selectedTodos.map(todo => TodoService.shareTodo(username, todo)))
             .then(() => {
 
             })
@@ -148,7 +170,8 @@ function TodoList() {
             </div>
 
             {todos.map((todo, index) => (
-                <TodoItem key={index} todo={todo} updateTodo={updateTodo}/>
+                <TodoItem key={index} todo={todo} updateTodo={updateTodo} categories={categories}
+                          selectedTodos={selectedTodos} setSelectedTodos={setSelectedTodos}/>
             ))}
             <div className={"form"}>
                 <label htmlFor="todo-input">New ToDo:</label>
@@ -169,15 +192,16 @@ function TodoList() {
                         Add ToDo
                     </button>
                     {
-                        todos.some(todo => todo.completed) && (
-                            <>
+                        selectedTodos.length > 0 && (
                                 <button
                                     className="share-button"
                                     onClick={handleShareClick}
                                 >
                                     Share
                                 </button>
-
+                        )}
+                    {
+                        todos.some(todo => todo.completed) && (
                                 <button
                                     className="delete-button"
                                     onClick={deleteCompletedTodos} // Ruft die Funktion deleteCompletedTodos auf, wenn geklickt wird
@@ -185,7 +209,6 @@ function TodoList() {
                                     Delete completed ToDos
 
                                 </button>
-                            </>
                         )}
 
                 </div>
