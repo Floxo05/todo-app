@@ -11,7 +11,7 @@ import (
 func TestTodoRepo_NewTodoRepo(t *testing.T) {
 	t.Run("should return a new TodoRepo", func(t *testing.T) {
 		// Act
-		repo := NewTodoRepo(nil)
+		repo := NewTodoRepo(nil, nil)
 
 		// Assert
 		expectedType := "*repository.TodoRepo"
@@ -38,7 +38,7 @@ func TestTodoRepo_GetAllTodosByUser(t *testing.T) {
 
 			mock.ExpectQuery("^SELECT (.+) FROM todos").WillReturnRows(rows)
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			todos, err := repo.GetAllTodosByUser(&types.User{ID: 1})
@@ -64,7 +64,7 @@ func TestTodoRepo_GetAllTodosByUser(t *testing.T) {
 
 			mock.ExpectQuery("^SELECT (.+) FROM todos").WillReturnRows(rows)
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			_, err := repo.GetAllTodosByUser(&types.User{ID: 1})
@@ -81,7 +81,7 @@ func TestTodoRepo_GetAllTodosByUser(t *testing.T) {
 
 			mock.ExpectQuery("^SELECT (.+) FROM todos").WillReturnRows(rows)
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			todos, err := repo.GetAllTodosByUser(&types.User{ID: 1})
@@ -112,7 +112,7 @@ func TestTodoRepo_CreateTodo(t *testing.T) {
 			mock.ExpectExec("^INSERT INTO todos").WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectExec("^INSERT INTO user_todos").WillReturnResult(sqlmock.NewResult(1, 1))
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			date, _ := time.Parse("2006-01-02 15:04:05", "2022-01-01 00:00:00")
@@ -133,7 +133,7 @@ func TestTodoRepo_CreateTodo(t *testing.T) {
 		t.Run("should return an error", func(t *testing.T) {
 			mock.ExpectExec("^INSERT INTO todos").WillReturnError(err)
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			date, _ := time.Parse("2006-01-02 15:04:05", "2022-01-01 00:00:00")
@@ -165,7 +165,7 @@ func TestTodoRepo_UpdateTodoById(t *testing.T) {
 		t.Run("should update a todo", func(t *testing.T) {
 			mock.ExpectExec("^UPDATE todos").WillReturnResult(sqlmock.NewResult(1, 1))
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			date, _ := time.Parse("2006-01-02 15:04:05", "2022-01-01 00:00:00")
@@ -187,7 +187,7 @@ func TestTodoRepo_UpdateTodoById(t *testing.T) {
 		t.Run("should return an error", func(t *testing.T) {
 			mock.ExpectExec("^UPDATE todos").WillReturnError(err)
 
-			repo := NewTodoRepo(db)
+			repo := NewTodoRepo(db, nil)
 
 			// Act
 			date, _ := time.Parse("2006-01-02 15:04:05", "2022-01-01 00:00:00")

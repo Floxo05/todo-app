@@ -30,7 +30,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	todoRepo := repository.NewTodoRepo(db)
+	catRepo := repository.NewCategoryRepo(db)
+	todoRepo := repository.NewTodoRepo(db, catRepo)
 	userRepo := repository.NewUserRepo(db, todoRepo)
 	userContextHelper := services.NewUserContext(userRepo)
 	passwordHasher := services.NewPasswordHasher()
@@ -38,6 +39,7 @@ func main() {
 	todoRoute := routes.NewTodoRoute(todoRepo, userContextHelper)
 	userRoute := routes.NewUserRoute(userRepo, passwordHasher, userContextHelper)
 	tokenRoute := routes.NewTokenRoute()
+	catRoute := routes.NewCategoryRoute(catRepo, userContextHelper)
 
 	// register Routes
 	authRoutes := r.Group("/auth")
@@ -49,7 +51,7 @@ func main() {
 		authRoutes.DELETE("/todo/:id", todoRoute.DeleteTodoById)
 		authRoutes.GET("/check-token", tokenRoute.CheckToken)
 		authRoutes.POST("/share", userRoute.ShareToUser)
-
+		authRoutes.POST("/category/create", catRoute.CreateCategory)
 	}
 
 	r.POST("/login", userRoute.Login)

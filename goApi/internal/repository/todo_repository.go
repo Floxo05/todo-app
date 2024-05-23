@@ -8,15 +8,21 @@ import (
 )
 
 type TodoRepo struct {
-	db *sql.DB
+	db           *sql.DB
+	categoryRepo types.CategoryRepository
 }
 
-func NewTodoRepo(db *sql.DB) *TodoRepo {
-	return &TodoRepo{db: db}
+func NewTodoRepo(db *sql.DB, repo types.CategoryRepository) *TodoRepo {
+	return &TodoRepo{db: db, categoryRepo: repo}
 }
 
 func (t *TodoRepo) GetAllTodosByUser(user *types.User) ([]types.Todo, error) {
-	rows, err := t.db.Query("SELECT t.id, t.title, t.completed, t.created_at, t.owner_id FROM todos t JOIN user_todos ut ON t.id = ut.todo_id WHERE ut.user_id = ?", user.ID)
+	rows, err := t.db.Query(`
+		SELECT 
+			t.id, t.title, t.completed, t.created_at, t.owner_id, t.category_id
+		FROM todos t 
+		    JOIN user_todos ut ON t.id = ut.todo_id 
+		WHERE ut.user_id = ?`, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,10 +31,21 @@ func (t *TodoRepo) GetAllTodosByUser(user *types.User) ([]types.Todo, error) {
 	var todos []types.Todo
 	for rows.Next() {
 		var todo types.Todo
+		var category types.Category
 		var createdAt string
-		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &createdAt, &todo.OwnerID)
+		var categoryID sql.NullInt64
+		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &createdAt, &todo.OwnerID, &categoryID)
 		if err != nil {
 			return nil, err
+		}
+
+		if categoryID.Valid {
+			var cat *types.Category
+			cat, err = t.categoryRepo.GetCategoryByID(int(categoryID.Int64))
+			if err != nil {
+				return nil, err
+			}
+			category = *cat
 		}
 
 		// Parse the string into a time.Time type
@@ -36,6 +53,8 @@ func (t *TodoRepo) GetAllTodosByUser(user *types.User) ([]types.Todo, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		todo.Category = category
 
 		todos = append(todos, todo)
 	}

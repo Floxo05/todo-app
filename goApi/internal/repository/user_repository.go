@@ -8,10 +8,10 @@ import (
 
 type UserRepo struct {
 	db       *sql.DB
-	todoRepo *TodoRepo
+	todoRepo types.TodoRepository
 }
 
-func NewUserRepo(db *sql.DB, repo *TodoRepo) *UserRepo {
+func NewUserRepo(db *sql.DB, repo types.TodoRepository) *UserRepo {
 	return &UserRepo{db: db, todoRepo: repo}
 }
 

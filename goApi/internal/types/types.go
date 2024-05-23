@@ -16,6 +16,13 @@ type TodoRepository interface {
 	CreateTodo(todo *Todo) error
 	UpdateTodoById(todo *Todo, user *User) error
 	DeleteTodoById(todo *Todo, user *User) error
+	IsOwner(todo *Todo, user *User) (bool, error)
+}
+
+type CategoryRepository interface {
+	UpsertCategory(category *Category) error
+	GetCategoryFromDB(category *Category) (*Category, error)
+	GetCategoryByID(id int) (*Category, error)
 }
 
 type Todo struct {
@@ -24,6 +31,13 @@ type Todo struct {
 	Completed bool      `json:"completed"`
 	CreatedAt time.Time `json:"created_at"`
 	OwnerID   int       `json:"owner_id"`
+	Category  Category  `json:"category"`
+}
+
+type Category struct {
+	ID            int    `json:"id"`
+	Title         string `json:"title"`
+	CreatedUserId int    `json:"created_user_id"`
 }
 
 type User struct {
@@ -37,6 +51,10 @@ type UserContextInterface interface {
 }
 
 type CreateTodoRequest struct {
+	Title string `json:"title"`
+}
+
+type CreateCategoryRequest struct {
 	Title string `json:"title"`
 }
 
